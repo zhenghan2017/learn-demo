@@ -1,4 +1,6 @@
 const express = require('express');
+const socketioJwt = require('socketio-jwt');
+const SECRET = 'your token secret';
 
 // 初始化app
 const app = express();
@@ -11,6 +13,12 @@ io
   // of可以分配路径
   .of('/news')
   .on('connection', function (socket) {
+    // token验证中间件
+    io.use(socketioJwt.authorize({
+      secret: SECRET,
+      handshake: true
+    }));
+
     // emit发送消息
     // on监听消息
     socket.emit('client', 'hello client');
