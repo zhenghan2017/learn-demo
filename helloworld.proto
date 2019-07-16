@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package hello;
+
+service Greet {
+  rpc sayHello(helloReq) returns (helloResp);
+  rpc getPerson(objectReq) returns (objectResp); 
+  rpc getList(listReq) returns (listResp);
+  rpc getType(enumsReq) returns (enumsResp);
+  rpc getByte(bytesReq) returns (bytesResp);
+}
+
+message helloReq {
+  string name = 1;
+}
+
+message helloResp {
+  string msg = 1;
+}
+
+message objectReq {
+  string name = 1;
+  int32 age = 2;
+  string sex = 3;
+}
+
+
+message Person {
+  string name = 1;
+  int32 age = 2;
+  string sex = 3;
+}
+
+message objectResp {
+  Person person = 1;
+}
+
+message listReq {
+
+}
+
+message listResp {
+  repeated int32 arr = 1;
+}
+
+message enumsReq {
+  string type = 1;
+}
+
+message enumsResp {
+  enum Types {
+    PUBLIC = 0;
+    PRIVATE = 1;
+    PROTECT = 2;
+  }
+  Types type = 1;
+}
+
+message bytesReq {
+
+}
+
+message bytesResp {
+  bytes file = 1;
+}

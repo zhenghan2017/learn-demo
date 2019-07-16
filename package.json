@@ -1,0 +1,17 @@
+{
+  "name": "grpc-demo",
+  "version": "1.0.0",
+  "description": "grpc-demo",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "zhenghan",
+  "license": "ISC",
+  "devDependencies": {
+    "@grpc/proto-loader": "^0.3.0",
+    "google-protobuf": "^3.6.1",
+    "grpc": "^1.15.0",
+    "grpc-web": "^1.0.0"
+  }
+}
