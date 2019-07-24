@@ -1,0 +1,425 @@
+package cn.beepower.eig.msg;
+option java_package = "cn.beepower.eig.msg";
+
+message JobDefine {
+    enum DriveCode {
+        EVENT_DRIVE = 1;
+        TIME_DRIVE = 2;
+    }
+    // 策略的id
+    required string id = 1;
+    // 策略触发的机制
+    required DriveCode driveCode = 2;
+    // 事件判断script
+    optional string eventJudgeExp = 3;
+    // 时间策略,写法参考quartz的cron trigger
+    optional string timeCronExp = 4;
+    // 遥控设备id队列
+    repeated string ykDeviceIds = 5;
+    // 遥控代码的script
+    repeated string ykDeviceExp = 6;
+    // 遥调设备id队列
+    repeated string ytDeviceIds = 7;
+    // 遥调代码
+    repeated string ytDeviceExp = 8;
+    // script
+    optional string executeExp = 9;
+    // 策略描述
+    optional string desc = 10;
+}
+
+message JobDefines {
+    repeated JobDefine jobs = 1;
+}
+
+message HisDataQuery {
+    required string pointId = 1; // 测点ID
+    required int64 start = 2;
+    required int64 end = 3;
+}
+
+message HisCommandQuery {
+    required int64 start = 1;
+    required int64 end = 2;
+    optional string commUnitId = 3; // 通道ID
+    optional int32 type = 4; // 指令类型  遥调、遥控
+    optional int64 eventId = 5; // 事件id
+}
+
+message HisEventQuery {
+    required int64 start = 1;
+    required int64 end = 2;
+    optional string keyWord = 3; // 事件名称关键字模糊搜索
+}
+
+message HisSoeQuery {
+    required int64 start = 1;
+    required int64 end = 2;
+    optional string pointName = 3; // 信号名称
+}
+
+enum REGISTER_TYPE {
+    COILS = 1;
+    DISCRETE = 2;
+    HOLDING = 3;
+    INPUT = 4;
+}
+enum DATA_TYPE {
+    INT16 = 1;
+    INT32 = 2;
+    INT64 = 3;
+    FLOAT = 4;
+    DOUBLE = 5;
+    UINT16 = 6;
+}
+// modbus寄存器数据模型
+message RegisterData {
+
+    // 寄存器类型
+    required REGISTER_TYPE type = 1;
+    // 终端ID
+    required int32 slaveId = 2;
+    // 起始地址
+    required int32 from = 3;
+    // 数据类型
+    optional DATA_TYPE dataType = 4;
+    // 对应的测点Id
+    optional int64 pointId = 5;
+    // 对应通信设备的Id
+    required string commUnitId = 6;
+    // 是否是高低位取反
+    optional bool isAddrInverse = 7;
+    // 是否必须新开一个请求
+    optional bool shouldNewRequest = 8;
+    // 轮询周期
+    optional int64 pollingPeriod = 9;
+}
+
+message RegisterDataList {
+    repeated RegisterData data = 1;
+}
+
+// iec 104 测点模型
+message Iec104Data {
+    // 104规约中地址
+    required int32 localAddress = 3;
+    // 对应的测点Id
+    optional int64 pointId = 5;
+    // 对应通信设备的Id
+    required string commUnitId = 6;
+}
+
+message Iec104DataList {
+    repeated Iec104Data data = 1;
+}
+
+//国电智深DCS接口站 测点模型
+message UserDefineGdzsData{
+    enum PointType{
+        AP=1;
+        DP=2;
+        GP=3;
+    }
+
+    //编号
+    required int32 serialNumber=1;
+    //点类型
+    required PointType pointType=2;
+    // 对应的测点Id
+    optional int64 pointId = 3;
+    // 对应通信设备的Id
+    required string commUnitId = 4;
+}
+message UserDefineGdzsDataList{
+    repeated UserDefineGdzsData data=1;
+}
+
+
+// 通道信息类
+message TransportInfo {
+    enum STATUS {
+        ON_LINE = 1;
+        OFF_LINE = 2;
+    }
+    enum PROTOCOL {
+        MODBUS = 1;
+        MODBUS_TCP = 2;
+        IEC104 = 3;
+        MQTTSN_SERIAL = 4;
+        MQTTSN_UPD = 5;
+        USER_DEFINE_1 = 6;
+        USER_DEFINE_2 = 7;
+        USER_DEFINE_3 = 8;
+        USER_DEFINE_4 = 9;
+        USER_DEFINE_5 = 10;
+        USER_DEFINE_GDZS=11; //国电智深DCS接口站协议
+        UNKNOWN = 100;
+    }
+    extensions 100 to max;   // 标识此字段可扩展，此处可指定扩展字段的ID有效范围，to max表示字段范围至最大值
+    // 设备Id
+    required int32 portId = 1;
+    required PROTOCOL protocol = 2;
+
+    required STATUS onOrOff = 3 [default = OFF_LINE];
+    // for serial
+    optional string serialPortName = 4;
+    optional int32 serialPortBaud = 5;
+    optional int32 dataBits = 6 [default = 8];
+    optional int32 stopBits = 7 [default = 1];
+    optional int32 parity = 8 [default = 0];
+    // for tcp/ip
+    // 通信设备的ID, 和MeasurePoint中的devId不一样
+    required string commUnitId = 9;
+    optional string tcpServerIp = 10;
+    optional int32 tcpServerPort = 11;
+    optional bool isConnected = 12;
+
+    // for iec 104
+    optional int32 iec104CommonAddress = 13 [default = 1]; // 主站的公共地址
+
+    optional int32 iec104MmessageFragmentTimeout = 14 [default = 5000] ;
+
+    optional int32 iec104CotFieldLength = 15 [default = 2]; // ASDU传送原因字段的长度
+    optional int32 iec104CommonAddressFieldLength = 16 [default = 2];// ASDU公共地址字段的长度
+    optional int32 iec104IoaFieldLength = 17 [default = 3];// ASDU信息体地址字段的长度
+
+    optional int32 iec104MaxTimeNoAckReceived = 18 [default = 15000]; // 超时时间t1
+    optional int32 iec104MaxTimeNoAckSent = 19 [default = 10000]; // 超时时间t2
+    optional int32 iec104MaxIdleTime = 20 [default = 20000]; // 超时时间t3
+
+    optional int32 iec104MaxUnconfirmedIPdusReceived = 21 [default = 8]; // 自动发送S格式报文确认之前收到的未确认I格式报文数
+    // 104测点配置
+    optional Iec104DataList iec104DataConfigure = 22;
+
+    // for modbus
+    optional int64 requestPeriodInMillisecond = 23 [default = 5000];
+    optional RegisterDataList mbDataConfigure = 24;
+    optional int32 maxReadBitCount = 25;
+    optional int32 maxReadRegisterCount = 26;
+    optional int32 maxWriteRegisterCount = 27;
+
+    required string portName = 28;   //通道名称
+
+    //国电智深DCS接口站通道新增参数
+    optional int32 domainNum=29;
+    optional int32 siteNum=30;
+    optional UserDefineGdzsDataList gdzsDataConfigure=31;
+}
+
+message TransportInfoes {
+    repeated TransportInfo transports = 1;
+}
+
+// 测点类
+message MeasurePoint {
+    enum RelayType {
+        MODBUS_TCP = 1;
+        IEC_104 = 2;
+     }
+
+    // 测点Id
+    required int64 pointId = 1;
+    // 是否有对应的转发地址
+    optional bool hasLocalAddress = 2;
+    // 转发地址
+    optional int32 localAddress = 3;
+    // 测点对应的设备,该设备指的是采集对象
+    optional string devId = 4;
+    // 模拟量or离散量
+    required bool isDiscrete = 5;
+    // 表达式
+    optional string expression = 6;
+    // 变化判断表达式
+    optional string changeExpression = 7;
+    // 变换公式，用于需要乘以系数再上传的情况，等等
+    optional string transExpression = 8;
+    // 变化是否为零的标准是
+    optional string zeroExpression = 9;
+    // 反变换公式，用于存在变换公式测点的控制
+    optional string invTransExpression = 10;
+    // 遥测点满码值
+    optional float maxValue = 11;
+
+    required string pointName = 12;   //测点名称
+    optional string dataUnit = 13;   //单位
+
+    //数值上限
+    optional float upperLimit=14;
+    //数值下限
+    optional float lowerLimit=15;
+    //数值变化率上限
+    optional float maxGradient=16;
+    //数值变化率下限
+    optional float minGradient=17;
+    //是否是实时测点
+    optional bool isRealtime=18 [default=false];
+
+    //是否转发 hasLocalAddress
+    //转发地址使用上面定义的localaddress
+    //转发协议
+    optional RelayType relayProtocol=19;
+    //转发名称
+    optional string relayName=20;
+    //modbus转发功能码
+    optional REGISTER_TYPE registerType=21;
+    //modbus转发数据类型
+    optional DATA_TYPE dataType=22;
+    //modbus转发slaveId
+    optional int32 slaveId=23;
+    // 是否会触发事件
+    optional bool isEvent = 24[default=false];
+    // 是否SOE测点
+    optional bool isSoe = 25[default=false];
+}
+
+message MeasurePoints {
+    repeated MeasurePoint points = 1;
+}
+
+// 测点值类
+message MeasureValue {
+    // 测点Id
+    optional int64 pointId = 1;
+    // 模拟量or离散量
+    optional bool isDiscrete = 2;
+    // 测量值
+    optional float analogValue = 3;
+    // 测量值
+    optional int32 discreteValue = 4;
+    // 时标
+    optional int64 timestamp = 5;
+    // 是否已经保存
+    optional bool isStored = 6 [default = false];
+    // 测量值是否经公式变化
+    optional bool isTransformed = 7 [default = false];
+    // 测量值
+    optional float transformedAnalog = 8;
+    // 测量值
+    optional int32 transformedDiscrete = 9;
+    // 变换公式
+    optional string transExpression = 10 [default = ""];
+
+    //数值状态标志。
+    //bit0 实时测点，bit2数值超下限，bit3数值超上限，bit8人工录入数据
+    //bit10数值变化率超下限，bit11数值变化率超上限，
+    //bit14无效数据，bit15超时无数据。
+    optional int32 flag=11 [default=0];
+     // 是否SOE测点
+     optional bool isSoe = 12[default=false];
+     optional string pointName = 13;   //测点名称
+}
+
+message MeasureValues {
+    repeated MeasureValue values = 1;
+}
+
+message HisCommands {
+    repeated EventCommands values = 1;
+}
+message EventCommands{
+    required Event event = 1;
+    repeated ControlBackInfo values = 2;
+}
+
+message Events {
+    repeated Event values = 1;
+}
+
+message SoeRecords {
+    repeated SoeRecord values = 1;
+}
+
+// 控制指令
+message Command {
+    enum ControlType {
+        YT = 1;
+        YK = 2;
+        YM = 3;
+        CALL_ALL = 4;
+    }
+    // 测点Id
+    optional int64 pointId = 2;
+    // 指令值
+    optional float ytCommand = 3;
+    optional int32 ykCommand = 4;
+    // 控制类型
+    optional ControlType type = 5;
+    // 时标
+    optional int64 timestamp = 6;
+    // 通信设备的ID
+    optional string commUnitId = 7;
+    // 控制选择/执行
+    optional bool isSelected = 8;
+    // 指令事件来源id
+    optional int64 eventId = 9;
+}
+
+// 控制指令的返回确认
+message ControlBackInfo {
+    // 对应的指令
+    required Command command = 1;
+    //客户端Id
+    required string clientId = 2;
+    //消息Id
+    required int64 msgId = 3;
+    //控制结果：成功or失败
+    required bool result = 4;
+    //失败时,返回的错误代码
+    optional int32 failureCode = 5;
+    // 时标
+    optional int64 thisMsgTime = 6;
+}
+
+message Event {
+    enum EventDriveType {
+        IMMEDIATELY = 1;
+        PERIODIC = 2;
+    }
+    enum EventHandleResult {
+        SUCCESS = 1;
+        FAILED = 2;
+        REMOVED = 3;
+    }
+    required int64 eventId = 1;
+    //指令类型
+    required int32 type = 2;
+    // 驱动方式
+    required EventDriveType driveType = 3;
+    // 事件名称
+    optional string name = 4;
+    // 事件对应的Command消息的Id
+    repeated int64 msgIds = 5;
+    // 发生时间
+    required int64 occurTime = 6;
+    // 开始处理时间
+    required int64 handleTime = 7;
+    // 结束时间
+    optional int64 finishTime = 8;
+    // 时间处理结果：成功or失败
+    optional EventHandleResult result = 9;
+    // 互斥事件的Type
+    repeated int32 exclusiveEvent = 10;
+    // 周期性事件的控制周期
+    optional int32 period = 11;
+}
+
+message SoeRecord {
+    // 测点id
+    required string pointId = 1;
+    //测点名称
+    required string name = 2;
+    //量测值
+    required bool value = 3;
+    // 发生时间
+    required int64 timestamp = 4;
+}
+
+message GwProfile {
+    optional string beeId = 1; //网关的beeid
+    repeated string commUnitIds = 2; //已经连接的设备
+    optional TransportInfoes transports = 3; // 已经配置的通道
+    optional MeasurePoints points = 4; // 已经配置的测点
+    repeated JobDefine jobDefines = 5; //网关中存储的任务
+    optional string eigVersion = 6; //eig程序版本
+}
+

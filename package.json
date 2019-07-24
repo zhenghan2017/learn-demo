@@ -1,0 +1,23 @@
+{
+  "name": "learn-demo",
+  "version": "1.0.0",
+  "description": "node与mqtt总线通讯demo",
+  "main": "ByteBufferAB.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhenghan2017/learn-demo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhenghan2017/learn-demo/issues"
+  },
+  "homepage": "https://github.com/zhenghan2017/learn-demo#readme",
+  "dependencies": {
+    "mqtt": "^3.0.0",
+    "protobufjs": "^6.8.8"
+  }
+}
