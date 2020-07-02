@@ -1,3 +1,3 @@
-# learn-demo
+# graphql-demo
 
-学习前端的各种小demo
+学习GraphQL的小例子
