@@ -3,10 +3,10 @@ import {
   GraphQLString,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLInt,
   GraphQLList
 } from 'graphql';
 import { TBaseDataStruct, baseData } from './mockData';
+import { UserType } from './typeDefine';
 
 
 // filter
@@ -19,43 +19,22 @@ export async function getUsers(): Promise<TBaseDataStruct[]> {
   return Promise.resolve(baseData);
 }
 
-// 类型定义
-const userType = new GraphQLObjectType({
-  name: 'User',
-  fields: () => ({
-    id: {
-      type: GraphQLNonNull(GraphQLInt)
-    },
-    name: {
-      type: GraphQLNonNull(GraphQLString)
-    },
-    title: {
-      type: GraphQLNonNull(GraphQLString)
-    },
-    age: {
-      type: GraphQLString
-    },
-    sex: {
-      type: GraphQLNonNull(GraphQLString)
-    }
-  })
-});
-
 // 查询定义
 const queryType = new GraphQLObjectType({
   name: 'Query',
   fields: () => ({
     user: {
-      type: userType,
+      type: UserType,
       args: {
         id: {
           type: GraphQLNonNull(GraphQLString)
         }
       },
+      // 解析器
       resolve: (_source, { id }) => getUserById(id)
     },
     users: {
-      type: GraphQLList(userType),
+      type: GraphQLList(UserType),
       resolve: async (_source, { }) => await getUsers()
     }
   })
@@ -63,6 +42,6 @@ const queryType = new GraphQLObjectType({
 
 export const userSchema: GraphQLSchema = new GraphQLSchema({
   query: queryType,
-  types: [userType],
+  types: [UserType],
 });
 
