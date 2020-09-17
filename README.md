@@ -1,3 +1,3 @@
-# learn-css
+# socket.io demo
 
-学习布局
+socket.io的文档比较详细，出现问题可以先翻阅官方文档
