@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/zhenghan2017/learn-demo#readme",
   "dependencies": {
+    "socket.io": "^2.3.0",
     "ws": "^7.3.1"
   }
 }

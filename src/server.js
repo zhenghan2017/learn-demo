@@ -1,12 +1,17 @@
 const WebSocket = require('ws');
 
 const PORT = 3000;
+let index = 1;
 
 const wsServer = new WebSocket.Server({ port: PORT }, () => {
   console.log(`server start on ${PORT}`)
 });
 
 wsServer.on('connection', (ws) => {
+  ws.id = index++;
+
+  console.log('wsId', ws.id)
+
   // emit只触发自身的事情，不能发送给客户端
   ws.on('message', data => {
     console.log(`client send：${data}`);
@@ -40,7 +45,7 @@ wsServer.on('connection', (ws) => {
   })
 
   ws.on('close', () => {
-    console.log('client close');
+    console.log(`client close ${ws.id}`);
   })
 
   ws.on('unexpected-response', (req, res) => {
